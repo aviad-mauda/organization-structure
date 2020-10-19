@@ -1,5 +1,6 @@
 package com.bpresice.service;
 
+import java.util.Date;
 import java.util.List;
 
 import org.bson.types.ObjectId;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.bpresice.entities.Counters;
 import com.bpresice.entities.Employee;
+import com.bpresice.entities.Manager;
 import com.bpresice.entities.Person;
 import com.bpresice.entities.Task;
 import com.bpresice.repository.PersonRepository;
@@ -53,6 +55,10 @@ public class PersonService {
 
 	public List<Task> getTasks(ObjectId employeeId) {
 		return personRepository.getTasks(employeeId);
+	}
+
+	public Manager submitReport(ObjectId employeeId, ObjectId managerId, String reportText, Date reportDate) {
+		return personRepository.submitReport(employeeId, managerId, reportText, reportDate);
 	}
 	
 }
