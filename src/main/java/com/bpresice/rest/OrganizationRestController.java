@@ -22,6 +22,8 @@ import com.bpresice.entities.GetTasks;
 import com.bpresice.entities.Manager;
 import com.bpresice.entities.Person;
 import com.bpresice.entities.Position;
+import com.bpresice.entities.Report;
+import com.bpresice.entities.SubmitReport;
 import com.bpresice.entities.Task;
 import com.bpresice.service.PersonService;
 import com.bpresice.validator.Validator;
@@ -94,7 +96,7 @@ public class OrganizationRestController {
 			service.assignManager(managerId, employeeId);
 			return new ResponseEntity<>(HttpStatus.OK);
 		} else { 
-			return new ResponseEntity<>("employee was not saved. id is not exist",HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>("employee was not saved. id is not exist",HttpStatus.NOT_FOUND);
 		}
 	}
 
@@ -148,6 +150,30 @@ public class OrganizationRestController {
 		}
 		
 		return new ResponseEntity<>(service.getTasks(employeeId), HttpStatus.OK);
+	}
+	
+	@PostMapping("/submitReport")
+	public ResponseEntity<?> submitReport(@RequestBody SubmitReport report){
+		
+		ObjectId employeeId = null;
+		ObjectId managerId = null;
+		try { 
+			employeeId = new ObjectId(report.getReport().getEmployeeId());
+			managerId = new ObjectId(report.getManagerId());
+		} catch (IllegalArgumentException e) { 
+			return new ResponseEntity<>(e,HttpStatus.BAD_REQUEST); 
+		}
+		
+		if(validator.isIdExist(service, managerId) && validator.isIdExist(service ,employeeId)) {
+			Report reportProperties = report.getReport();
+			Manager res = service.submitReport(employeeId, managerId, reportProperties.getReportText(), reportProperties.getReportDate());
+			if(res == null) {
+				return new ResponseEntity<>("task was not saved - manager not assigned to this employee or the position is employee",HttpStatus.BAD_REQUEST);
+			}
+			return new ResponseEntity<>(res, HttpStatus.OK);
+		} else { 
+			return new ResponseEntity<>("id is not exist",HttpStatus.NOT_FOUND);
+		}
 	}
 	
 }

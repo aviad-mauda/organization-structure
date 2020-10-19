@@ -1,12 +1,14 @@
 package com.bpresice.repository;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -18,6 +20,7 @@ import com.bpresice.entities.Employee;
 import com.bpresice.entities.Manager;
 import com.bpresice.entities.Person;
 import com.bpresice.entities.Position;
+import com.bpresice.entities.Report;
 import com.bpresice.entities.Task;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.result.UpdateResult;
@@ -145,6 +148,34 @@ public class PersonRepository {
 		query.fields().include("tasks");
 		Employee res = mongoTemplate.findById(employeeId, Employee.class);
 		return res.getTasks();
+	}
+
+	public Manager submitReport(ObjectId employeeId, ObjectId managerId, String reportText, Date reportDate) {
+		Query query = new Query();
+		query.fields().include("tasks");
+		Manager manager = mongoTemplate.findById(managerId, Manager.class);
+		Employee employee = mongoTemplate.findById(employeeId, Employee.class);
+		if(manager.getPosition().name().equals(Position.MANAGER.name()) && employee.getManagerId() != null && employee.getManagerId().toHexString().equals(managerId.toHexString())) {
+			List<Report> reports = manager.getReports();
+			if (reports == null) reports = new ArrayList<Report>();
+			setReport(employeeId, reportText, reportDate, reports);
+			
+			Query qry = new Query(Criteria.where("_id").is(managerId));
+			Update update = new Update();
+			update.set("reports", reports);
+			FindAndModifyOptions options = new FindAndModifyOptions();
+			options.returnNew(true);
+			return mongoTemplate.findAndModify(qry, update, options, Manager.class);
+		}
+		return null;
+	}
+
+	private void setReport(ObjectId employeeId, String reportText, Date reportDate, List<Report> reports) {
+		Report report = new Report();
+		report.setEmployeeId(employeeId.toHexString());
+		report.setReportDate(reportDate);
+		report.setReportText(reportText);
+		reports.add(report);
 	}
 	
 
