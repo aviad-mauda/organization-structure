@@ -136,18 +136,17 @@ public class OrganizationRestController {
 		return new ResponseEntity<>(service.overloadedEmployees(), HttpStatus.OK);
 	}
 	
-//	@PostMapping("/getTasks")
-//	@ResponseBody
-//	public ResponseEntity<?>  getTasks(@RequestBody String id){
-//		
-//		ObjectId employeeId = null;
-//
-//		try { 
-//			employeeId = new ObjectId(id);
-//		} catch (IllegalArgumentException e) { 
-//			return new ResponseEntity<>(e,HttpStatus.BAD_REQUEST); 
-//		}
-//		
-//		return new ResponseEntity<>(service.getTasks(), HttpStatus.OK);
-//	}
+	@PostMapping("/getTasks")
+	public ResponseEntity<?> getTasks(@RequestBody String id){
+		
+		ObjectId employeeId = null;
+		try { 
+			employeeId = new ObjectId(id);
+		} catch (IllegalArgumentException e) { 
+			return new ResponseEntity<>(e,HttpStatus.BAD_REQUEST); 
+		}
+		
+		return new ResponseEntity<>(service.getTasks(employeeId), HttpStatus.OK);
+	}
+	
 }
