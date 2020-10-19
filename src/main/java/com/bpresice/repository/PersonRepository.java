@@ -139,6 +139,13 @@ public class PersonRepository {
 				"}"));
 		return mongoTemplate.find(query, Counters.class);
 	}
+
+	public Object getTasks(ObjectId employeeId) {
+		Query query = new Query();
+		query.fields().include("tasks");
+		List<Employee> res = mongoTemplate.find(query, Employee.class);
+		return res;
+	}
 	
 
 }
