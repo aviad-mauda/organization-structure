@@ -51,7 +51,7 @@ public class PersonService {
 		return personRepository.overloadedEmployees();
 	}
 
-	public Object getTasks(ObjectId employeeId) {
+	public List<Task> getTasks(ObjectId employeeId) {
 		return personRepository.getTasks(employeeId);
 	}
 	

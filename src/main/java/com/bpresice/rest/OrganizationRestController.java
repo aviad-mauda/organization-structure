@@ -18,6 +18,7 @@ import com.bpresice.entities.AssignRequest;
 import com.bpresice.entities.AssignTask;
 import com.bpresice.entities.Counters;
 import com.bpresice.entities.Employee;
+import com.bpresice.entities.GetTasks;
 import com.bpresice.entities.Manager;
 import com.bpresice.entities.Person;
 import com.bpresice.entities.Position;
@@ -137,11 +138,11 @@ public class OrganizationRestController {
 	}
 	
 	@PostMapping("/getTasks")
-	public ResponseEntity<?> getTasks(@RequestBody String id){
+	public ResponseEntity<?> getTasks(@RequestBody GetTasks id){
 		
 		ObjectId employeeId = null;
 		try { 
-			employeeId = new ObjectId(id);
+			employeeId = new ObjectId(id.getEmployeeId());
 		} catch (IllegalArgumentException e) { 
 			return new ResponseEntity<>(e,HttpStatus.BAD_REQUEST); 
 		}

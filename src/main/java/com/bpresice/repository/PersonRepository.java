@@ -140,11 +140,11 @@ public class PersonRepository {
 		return mongoTemplate.find(query, Counters.class);
 	}
 
-	public Object getTasks(ObjectId employeeId) {
+	public List<Task> getTasks(ObjectId employeeId) {
 		Query query = new Query();
 		query.fields().include("tasks");
-		List<Employee> res = mongoTemplate.find(query, Employee.class);
-		return res;
+		Employee res = mongoTemplate.findById(employeeId, Employee.class);
+		return res.getTasks();
 	}
 	
 
