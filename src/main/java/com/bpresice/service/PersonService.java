@@ -11,6 +11,7 @@ import com.bpresice.entities.Counters;
 import com.bpresice.entities.Employee;
 import com.bpresice.entities.Manager;
 import com.bpresice.entities.Person;
+import com.bpresice.entities.Report;
 import com.bpresice.entities.Task;
 import com.bpresice.repository.PersonRepository;
 import com.mongodb.client.result.UpdateResult;
@@ -59,6 +60,10 @@ public class PersonService {
 
 	public Manager submitReport(ObjectId employeeId, ObjectId managerId, String reportText, Date reportDate) {
 		return personRepository.submitReport(employeeId, managerId, reportText, reportDate);
+	}
+
+	public List<Report> getReports(ObjectId managerId) {
+		return personRepository.getReports(managerId);
 	}
 	
 }

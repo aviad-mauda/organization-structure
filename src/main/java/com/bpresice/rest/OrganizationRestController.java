@@ -14,17 +14,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bpresice.entities.AssignRequest;
-import com.bpresice.entities.AssignTask;
 import com.bpresice.entities.Counters;
 import com.bpresice.entities.Employee;
-import com.bpresice.entities.GetTasks;
 import com.bpresice.entities.Manager;
 import com.bpresice.entities.Person;
 import com.bpresice.entities.Position;
 import com.bpresice.entities.Report;
-import com.bpresice.entities.SubmitReport;
 import com.bpresice.entities.Task;
+import com.bpresice.rest.entities.AssignRequest;
+import com.bpresice.rest.entities.AssignTask;
+import com.bpresice.rest.entities.GetReports;
+import com.bpresice.rest.entities.GetTasks;
+import com.bpresice.rest.entities.SubmitReport;
 import com.bpresice.service.PersonService;
 import com.bpresice.validator.Validator;
 import com.mongodb.client.result.UpdateResult;
@@ -83,15 +84,13 @@ public class OrganizationRestController {
 	@PostMapping("/assignManager")
 	@ResponseBody
 	public ResponseEntity<?> assignManager(@RequestBody AssignRequest ids) {
-		ObjectId managerId = null;
-		ObjectId employeeId = null;
-
-		try { 
-			managerId = new ObjectId(ids.getManagerId());
-			employeeId = new ObjectId(ids.getEmployeeId());
-		} catch (IllegalArgumentException e) { 
-			return new ResponseEntity<>(e,HttpStatus.BAD_REQUEST);
+		
+		if(!validator.isIdValid(ids.getManagerId()) || !validator.isIdValid(ids.getEmployeeId())) {
+			return new ResponseEntity<>("id is not valid",HttpStatus.BAD_REQUEST);
 		}
+		ObjectId managerId = new ObjectId(ids.getManagerId());
+		ObjectId employeeId = new ObjectId(ids.getEmployeeId());
+
 		if(validator.isIdExist(service, managerId) && validator.isIdExist(service ,employeeId)) {
 			service.assignManager(managerId, employeeId);
 			return new ResponseEntity<>(HttpStatus.OK);
@@ -103,15 +102,13 @@ public class OrganizationRestController {
 	@PostMapping("/assignTask")
 	@ResponseBody
 	public ResponseEntity<?> assignTask(@RequestBody AssignTask assignTask) {
-		ObjectId managerId = null;
-		ObjectId employeeId = null;
 
-		try { 
-			managerId = new ObjectId(assignTask.getManagerId());
-			employeeId = new ObjectId(assignTask.getEmployeeId());
-		} catch (IllegalArgumentException e) { 
-			return new ResponseEntity<>(e,HttpStatus.BAD_REQUEST); 
+		if(!validator.isIdValid(assignTask.getManagerId()) || !validator.isIdValid(assignTask.getEmployeeId())) {
+			return new ResponseEntity<>("id is not valid",HttpStatus.BAD_REQUEST);
 		}
+		ObjectId managerId = new ObjectId(assignTask.getManagerId());
+		ObjectId employeeId = new ObjectId(assignTask.getEmployeeId());
+		
 		if(validator.isIdExist(service, managerId) && validator.isIdExist(service ,employeeId)) {
 			Employee res = service.AssignTask(managerId, employeeId, assignTask.getTask());
 			if(res == null) {
@@ -142,27 +139,32 @@ public class OrganizationRestController {
 	@PostMapping("/getTasks")
 	public ResponseEntity<?> getTasks(@RequestBody GetTasks id){
 		
-		ObjectId employeeId = null;
-		try { 
-			employeeId = new ObjectId(id.getEmployeeId());
-		} catch (IllegalArgumentException e) { 
-			return new ResponseEntity<>(e,HttpStatus.BAD_REQUEST); 
+		if(!validator.isIdValid(id.getEmployeeId())) {
+			return new ResponseEntity<>("id is not valid",HttpStatus.BAD_REQUEST);
 		}
+		ObjectId employeeId = new ObjectId(id.getEmployeeId());
 		
 		return new ResponseEntity<>(service.getTasks(employeeId), HttpStatus.OK);
 	}
+
+//	private boolean isIdValid(String id) {
+//		ObjectId employeeId = null;
+//		try { 
+//			employeeId = new ObjectId(id);
+//		} catch (IllegalArgumentException e) { 
+//			 return false;
+//		}
+//		return true;
+//	}
 	
 	@PostMapping("/submitReport")
 	public ResponseEntity<?> submitReport(@RequestBody SubmitReport report){
 		
-		ObjectId employeeId = null;
-		ObjectId managerId = null;
-		try { 
-			employeeId = new ObjectId(report.getReport().getEmployeeId());
-			managerId = new ObjectId(report.getManagerId());
-		} catch (IllegalArgumentException e) { 
-			return new ResponseEntity<>(e,HttpStatus.BAD_REQUEST); 
+		if(!validator.isIdValid(report.getReport().getEmployeeId()) || !validator.isIdValid(report.getManagerId())) {
+			return new ResponseEntity<>("id is not valid",HttpStatus.BAD_REQUEST);
 		}
+		ObjectId managerId = new ObjectId(report.getReport().getEmployeeId());
+		ObjectId employeeId = new ObjectId(report.getManagerId());
 		
 		if(validator.isIdExist(service, managerId) && validator.isIdExist(service ,employeeId)) {
 			Report reportProperties = report.getReport();
@@ -176,4 +178,18 @@ public class OrganizationRestController {
 		}
 	}
 	
+	@PostMapping("/getReports")
+	public ResponseEntity<?> getReports(@RequestBody GetReports reportManager){
+		if(!validator.isIdValid(reportManager.getManagerId())) {
+			return new ResponseEntity<>("id is not valid",HttpStatus.BAD_REQUEST);
+		}
+		
+		ObjectId managerId = new ObjectId(reportManager.getManagerId());
+		
+		if(validator.isIdExist(service, managerId)) {
+			return new ResponseEntity<>(service.getReports(managerId), HttpStatus.OK);
+		} else { 
+			return new ResponseEntity<>("id is not exist",HttpStatus.NOT_FOUND);
+		}
+	}
 }

@@ -1,4 +1,4 @@
-package com.bpresice.entities;
+package com.bpresice.rest.entities;
 
 public class AssignRequest {
 	String managerId;

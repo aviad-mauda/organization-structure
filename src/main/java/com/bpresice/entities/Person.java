@@ -8,10 +8,8 @@ import org.bson.types.ObjectId;
 import lombok.Data;
 
 @Data
-public class Person implements IPerson{
+public class Person{
 
-//	@Id
-//	private UUID id;
 	private String firstName;
 	private String lastName;
 	private Position position;
@@ -58,18 +56,6 @@ public class Person implements IPerson{
 
 	public void setPosition(Position position) {
 		this.position = position;
-	}
-
-//	public UUID getId() {
-//		return id;
-//	}
-//
-//	public void setId(UUID id) {
-//		this.id = id;
-//	}
-
-	@Override
-	public void savePerson(Person person) {
 	}
 
 	public ObjectId getManagerId() {

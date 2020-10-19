@@ -177,6 +177,11 @@ public class PersonRepository {
 		report.setReportText(reportText);
 		reports.add(report);
 	}
+
+	public List<Report> getReports(ObjectId managerId) {
+		Manager res = mongoTemplate.findById(managerId, Manager.class);
+		return res.getReports();
+	}
 	
 
 }
