@@ -1,4 +1,6 @@
-package com.bpresice.entities;
+package com.bpresice.rest.entities;
+
+import com.bpresice.entities.Task;
 
 public class AssignTask {
 	String managerId;

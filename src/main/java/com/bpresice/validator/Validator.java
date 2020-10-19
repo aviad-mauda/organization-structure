@@ -14,4 +14,13 @@ public class Validator {
 		return service.isIdExist(id);
 	}
 
+	public boolean isIdValid(String id) {
+		ObjectId employeeId = null;
+		try { 
+			employeeId = new ObjectId(id);
+		} catch (IllegalArgumentException e) { 
+			 return false;
+		}
+		return true;
+	}
 }
