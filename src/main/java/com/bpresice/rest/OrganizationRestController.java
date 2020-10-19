@@ -1,7 +1,6 @@
 package com.bpresice.rest;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bpresice.entities.Counters;
 import com.bpresice.entities.Employee;
 import com.bpresice.entities.Manager;
 import com.bpresice.entities.Person;

@@ -7,7 +7,6 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.bpresice.entities.Counters;
 import com.bpresice.entities.Employee;
 import com.bpresice.entities.Manager;
 import com.bpresice.entities.Person;

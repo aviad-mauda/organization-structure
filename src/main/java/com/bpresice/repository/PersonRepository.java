@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
@@ -22,7 +21,6 @@ import com.bpresice.entities.Person;
 import com.bpresice.entities.Position;
 import com.bpresice.entities.Report;
 import com.bpresice.entities.Task;
-import com.mongodb.client.MongoCollection;
 import com.mongodb.client.result.UpdateResult;
 
 @Repository
@@ -36,13 +34,18 @@ public class PersonRepository {
 	}
 
 	public UpdateResult incrementEWorkersCounter() {
+		Query query = getCountersDocument();
+		Update update = new Update();
+		update.inc("workers", 1);
+		return mongoTemplate.updateFirst(query, update, Counters.class);
+	}
+
+	private Query getCountersDocument() {
 		Query query = new Query();
 		query.addCriteria(Criteria.where("$where").is("function() {\n" + 
 				"   return (this.workers > -1)\n" + 
 				"}"));
-		Update update = new Update();
-		update.inc("workers", 1);
-		return mongoTemplate.updateFirst(query, update, Counters.class);
+		return query;
 	}
 
 	public Employee assignManager(ObjectId managerId, ObjectId employeeId) {
@@ -72,26 +75,17 @@ public class PersonRepository {
 	}
 
 	public UpdateResult updateTasksCounter() {
-		Query query = new Query();
-		query.addCriteria(Criteria.where("$where").is("function() {\n" + 
-				"   return (this.workers > -1)\n" + 
-				"}"));
+		Query query = getCountersDocument();
 		Update update = new Update();
 		update.inc("tasks", 1);
 		return mongoTemplate.updateFirst(query, update, Counters.class);
 	}
 
 	public UpdateResult updateSTD() {
-//		List<Counters> employeesAndTasks= employeesAndTasks();
-//		Integer workers = employeesAndTasks.get(0).getWorkers();
-//		Integer tasks = employeesAndTasks.get(0).getTasks();
 		List<Employee> employees = getTaskFromDocs();
 		double std = calculateStd(employees);
 		
-		Query query = new Query();
-		query.addCriteria(Criteria.where("$where").is("function() {\n" + 
-				"   return (this.workers > -1)\n" + 
-				"}"));
+		Query query = getCountersDocument();
 		Update update = new Update();
 		update.set("std", std);
 		UpdateResult res = mongoTemplate.updateFirst(query, update, Counters.class);
@@ -136,10 +130,7 @@ public class PersonRepository {
 	}
 
 	private List<Counters> employeesAndTasks() {
-		Query query = new Query();
-		query.addCriteria(Criteria.where("$where").is("function() {\n" + 
-				"   return (this.workers > -1)\n" + 
-				"}"));
+		Query query = getCountersDocument();
 		return mongoTemplate.find(query, Counters.class);
 	}
 
