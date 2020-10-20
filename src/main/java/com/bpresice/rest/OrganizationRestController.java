@@ -1,6 +1,7 @@
 package com.bpresice.rest;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,6 +105,11 @@ public class OrganizationRestController {
 		if(!validator.isIdValid(assignTask.getManagerId()) || !validator.isIdValid(assignTask.getEmployeeId())) {
 			return new ResponseEntity<>("id is not valid",HttpStatus.BAD_REQUEST);
 		}
+		Date assignDate = assignTask.getTask().getAssignDate();
+		Date dueDate = assignTask.getTask().getDueDate();
+		if(!validator.isDateLater(assignDate, dueDate) && (!validator.isDateLater(new Date(), assignDate))){
+			return new ResponseEntity<>("due date should be later then assign date ",HttpStatus.BAD_REQUEST);
+		}
 		ObjectId managerId = new ObjectId(assignTask.getManagerId());
 		ObjectId employeeId = new ObjectId(assignTask.getEmployeeId());
 		
@@ -145,22 +151,16 @@ public class OrganizationRestController {
 		return new ResponseEntity<>(service.getTasks(employeeId), HttpStatus.OK);
 	}
 
-//	private boolean isIdValid(String id) {
-//		ObjectId employeeId = null;
-//		try { 
-//			employeeId = new ObjectId(id);
-//		} catch (IllegalArgumentException e) { 
-//			 return false;
-//		}
-//		return true;
-//	}
-	
 	@PostMapping("/submitReport")
 	public ResponseEntity<?> submitReport(@RequestBody SubmitReport report){
 		
 		if(!validator.isIdValid(report.getReport().getEmployeeId()) || !validator.isIdValid(report.getManagerId())) {
 			return new ResponseEntity<>("id is not valid",HttpStatus.BAD_REQUEST);
 		}
+		if(!validator.isDateLater(new Date(), report.getReport().getReportDate())){
+			return new ResponseEntity<>("due date should be later then assign date ",HttpStatus.BAD_REQUEST);
+		}
+		
 		ObjectId managerId = new ObjectId(report.getReport().getEmployeeId());
 		ObjectId employeeId = new ObjectId(report.getManagerId());
 		
